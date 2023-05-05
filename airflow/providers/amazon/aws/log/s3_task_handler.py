@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import re
 import shutil
 
 from packaging.version import Version
@@ -28,6 +29,7 @@ from airflow.configuration import conf
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.utils.log.file_task_handler import FileTaskHandler
 from airflow.utils.log.logging_mixin import LoggingMixin
+from airflow.utils.platform import IS_WINDOWS
 
 
 def get_default_delete_local_copy():
@@ -100,6 +102,8 @@ class S3TaskHandler(FileTaskHandler, LoggingMixin):
 
         local_loc = os.path.join(self.local_base, self.log_relative_path)
         remote_loc = os.path.join(self.remote_base, self.log_relative_path)
+        if IS_WINDOWS:
+            remote_loc = re.sub(r'_colon_', ':', remote_loc)
         if os.path.exists(local_loc):
             # read log and remove old logs to get just the latest additions
             log = pathlib.Path(local_loc).read_text()

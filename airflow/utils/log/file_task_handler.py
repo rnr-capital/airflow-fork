@@ -136,7 +136,7 @@ def _interleave_logs(*logs):
 
 def _clean_path(path):
     # Replace invalid characters with an underscore
-    path = re.sub(r'[<>:"|?*]', '_', path)
+    path = re.sub(r':', '_colon_', path)
     return path
 
 
