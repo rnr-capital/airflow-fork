@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import os
 import warnings
+import re
 from contextlib import suppress
 from enum import Enum
 from pathlib import Path
@@ -39,6 +40,7 @@ from airflow.utils.log.logging_mixin import SetContextPropagate
 from airflow.utils.log.non_caching_file_handler import NonCachingFileHandler
 from airflow.utils.session import create_session
 from airflow.utils.state import State, TaskInstanceState
+from airflow.utils.platform import IS_WINDOWS
 
 if TYPE_CHECKING:
     from airflow.models import TaskInstance
@@ -130,6 +132,12 @@ def _interleave_logs(*logs):
         if v != last:  # dedupe
             yield v
         last = v
+
+
+def _clean_path(path):
+    # Replace invalid characters with an underscore
+    path = re.sub(r':', '_colon_', path)
+    return path
 
 
 class FileTaskHandler(logging.Handler):
@@ -464,11 +472,15 @@ class FileTaskHandler(logging.Handler):
             conf.get("logging", "file_task_handler_new_file_permissions", fallback="0o664"), 8
         )
         local_relative_path = self._render_filename(ti, ti.try_number)
+        if IS_WINDOWS:
+            local_relative_path = _clean_path(local_relative_path)
         full_path = os.path.join(self.local_base, local_relative_path)
         if ti.is_trigger_log_context is True:
             # if this is true, we're invoked via set_context in the context of
             # setting up individual trigger logging. return trigger log path.
             full_path = self.add_triggerer_suffix(full_path=full_path, job_id=ti.triggerer_job.id)
+        if IS_WINDOWS:
+            full_path = os.path.normpath(full_path)
         self._prepare_log_folder(Path(full_path).parent)
 
         if not os.path.exists(full_path):
