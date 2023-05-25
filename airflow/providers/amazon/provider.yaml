@@ -19,10 +19,11 @@
 package-name: apache-airflow-providers-amazon
 name: Amazon
 description: |
-    Amazon integration (including `Amazon Web Services (AWS) <https://aws.amazon.com/>`__).
+  Amazon integration (including `Amazon Web Services (AWS) <https://aws.amazon.com/>`__).
 
 suspended: false
 versions:
+  - 8.0.1.dev0
   - 8.0.0
   - 7.4.1
   - 7.4.0
