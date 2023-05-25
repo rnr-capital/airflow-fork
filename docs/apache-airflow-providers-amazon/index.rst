@@ -74,7 +74,7 @@ Package apache-airflow-providers-amazon
 Amazon integration (including `Amazon Web Services (AWS) <https://aws.amazon.com/>`__).
 
 
-Release: 8.0.0
+Release: 8.0.1.dev0
 
 Provider package
 ----------------
